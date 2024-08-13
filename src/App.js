@@ -1,16 +1,15 @@
-import { useState } from 'react';
-import Track from './components/Track';
-import SearchResults from './components/SearchResults';
-import Playlist from './components/Playlist';
+import Welcome from './pages/Welcome';
+import Home from './pages/Home';
+import { Routes, Route } from 'react-router-dom';
 
 function App() {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
     
     return (
         <div>
-            <input type="text" placeholder="Search for a song..." onChange={event => setSearchQuery(event.target.value)} />
-            <p>{searchQuery}</p>
+            <Routes>
+                <Route path='/' element={<Welcome />} />
+                <Route path='/home' element={<Home />} />
+            </Routes>
         </div>
     );
 }
