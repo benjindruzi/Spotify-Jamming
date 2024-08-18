@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 function Callback() {
     const navigate = useNavigate();
     const clientId = process.env.REACT_APP_CLIENT_ID;
-    const { setUser, setIsAuthenticated } = useAuth();
+    const { setUser, setIsAuthenticated, storeToken, clearToken } = useAuth();
     
     useEffect(() => {
         async function handleAuth() {
@@ -19,23 +19,21 @@ function Callback() {
             }
 
             try {
-                const token = await getAccessToken(clientId, code);
+                const [token, expiresIn] = await getAccessToken(clientId, code);
                 const profile = await fetchProfile(token);
-                localStorage.setItem('token', token);
                 setUser(profile);
-                setIsAuthenticated(true);
+                storeToken(token, expiresIn);
                 console.log('Authentication successful');
                 navigate('/home');
             } catch (error) {
                 console.error('Authentication failed: ', error);
-                setUser(null);
-                setIsAuthenticated(false);
+                clearToken();
                 navigate('/');
             }
         }
 
         handleAuth();
-    }, [clientId, navigate, setUser, setIsAuthenticated]);
+    }, [clientId, setUser, setIsAuthenticated, clearToken, storeToken, navigate]);
 
     return (
         <div>Loading...</div>

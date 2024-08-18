@@ -1,3 +1,24 @@
+const generateRandomString = (length) => {
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const values = crypto.getRandomValues(new Uint8Array(length));
+
+    return values.reduce((acc, x) => acc + possible[x % possible.length], '');
+}
+
+const sha256 = async (plain) => {
+    const encoder = new TextEncoder()
+    const data = encoder.encode(plain)
+
+    return window.crypto.subtle.digest('SHA-256', data)
+}
+
+const base64encode = (input) => {
+    return btoa(String.fromCharCode(...new Uint8Array(input)))
+        .replace(/=/g, '')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_');
+}
+
 export async function redirectToAuthCodeFlow(clientId) {
     const codeVerifier  = generateRandomString(64);
     const hashed = await sha256(codeVerifier)
@@ -18,7 +39,6 @@ export async function redirectToAuthCodeFlow(clientId) {
 
 export async function getAccessToken(clientId, code) {
     const codeVerifier = localStorage.getItem('code_verifier');
-
     const params = new URLSearchParams();
     params.append('client_id', clientId);
     params.append('grant_type', 'authorization_code');
@@ -26,7 +46,7 @@ export async function getAccessToken(clientId, code) {
     params.append('redirect_uri', `${process.env.REACT_APP_REDIRECT_URI}`);
     params.append('code_verifier', codeVerifier);
 
-    const result = await fetch('https://accounts.spotify.com/api/token', {
+    const response = await fetch('https://accounts.spotify.com/api/token', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -34,39 +54,48 @@ export async function getAccessToken(clientId, code) {
         body: params
     });
 
-    const { access_token } = await result.json();
+    const { access_token, expires_in } = await response.json();
 
-    return access_token;
+    return [access_token, expires_in];
 }
 
 export async function fetchProfile(token) {
-    const result = await fetch('https://api.spotify.com/v1/me', {
+    const response = await fetch('https://api.spotify.com/v1/me', {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`
         }
     });
 
-    return await result.json();
+    const data = await response.json();
+
+    return data;
 }
 
-const generateRandomString = (length) => {
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const values = crypto.getRandomValues(new Uint8Array(length));
+export async function searchTracks(token, query) {
+    const params = new URLSearchParams();
+    params.append('q', query);
+    params.append('type', 'track');
+    params.append('limit', '10');
 
-    return values.reduce((acc, x) => acc + possible[x % possible.length], '');
-}
+    const response = await fetch(`https://api.spotify.com/v1/search?${params.toString()}`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`,
+        }
+    });
 
-const sha256 = async (plain) => {
-    const encoder = new TextEncoder()
-    const data = encoder.encode(plain)
+    const data = await response.json();
 
-    return window.crypto.subtle.digest('SHA-256', data)
-}
+    if (!response.ok) {
+        console.log('Failed to search songs: ', data);
+        return;
+    }
 
-const base64encode = (input) => {
-    return btoa(String.fromCharCode(...new Uint8Array(input)))
-        .replace(/=/g, '')
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_');
+    if (!data.tracks.items) {
+        console.log('No tracks found: ', data);
+        return [];
+    }
+    
+    return data.tracks.items;
 }

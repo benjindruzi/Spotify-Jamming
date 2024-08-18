@@ -1,14 +1,12 @@
 import Track from './Track';
 
-function SearchResults({ tracks }) {
-    if (tracks.length === 0) {
-        return <p>No results found</p>;
-    }
-
+function SearchResults({ tracks, onAddTrack }) {
+    if (!tracks) return <p>No tracks found</p>;
+    
     return (
-        <div>
+        <div className="search-results">
             {tracks.map((track, index) => (
-                <Track key={index} title={track.title} artist={track.artist} />
+                <Track key={index} track={track} onAdd={() => onAddTrack(track)} />
             ))}
         </div>
     );
