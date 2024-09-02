@@ -50,11 +50,19 @@ function Home() {
 
     return (
         <div className="home-container">
-            <p>Welcome {user.email}</p>
-            <input type="text" placeholder="Search for a song..." onChange={event => setQuery(event.target.value)} />
+            <div className="header">
+                <h1>Spotify Jamming</h1>
+                <p>Welcome {user.email}</p>
+            </div>
             <div className="content">
-                <SearchResults tracks={results} onAddTrack={handleAddTrack} />
-                <Playlist selectedTracks={selectedTracks} />
+                <div className="search-side">
+                    <input type="text" placeholder="Search for a song..." onChange={event => setQuery(event.target.value)} />
+                    <SearchResults tracks={results} onAddTrack={handleAddTrack} />
+                </div>
+                <div className="playlist-side">
+                    <input type="text" placeholder="Rename your playlist..." onChange={event => setQuery(event.target.value)} />
+                    <Playlist selectedTracks={selectedTracks} />
+                </div>
             </div>
         </div>
     );

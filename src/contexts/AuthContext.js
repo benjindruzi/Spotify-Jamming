@@ -31,7 +31,7 @@ export function AuthProvider({ children }) {
                 }
             }
         }
-    }, [token, navigate]);
+    }, [token, user, navigate]);
 
     const storeToken = (newToken, expiresIn) => {
         localStorage.setItem('token', newToken);

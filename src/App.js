@@ -9,13 +9,11 @@ import ProtectedRoute from './components/ProtectedRoute';
 function App() {
     return (
         <AuthProvider>
-            <div>
-                <Routes>
-                    <Route path='/' element={<Welcome onClick={() => redirectToAuthCodeFlow(process.env.REACT_APP_CLIENT_ID)} />} />
-                    <Route path='/callback' element={<Callback />} />
-                    <Route path='/home' element={<ProtectedRoute><Home /></ProtectedRoute>} />
-                </Routes>
-            </div>
+            <Routes>
+                <Route path='/' element={<Welcome onClick={() => redirectToAuthCodeFlow(process.env.REACT_APP_CLIENT_ID)} />} />
+                <Route path='/callback' element={<Callback />} />
+                <Route path='/home' element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            </Routes>
         </AuthProvider>
     );
 }
