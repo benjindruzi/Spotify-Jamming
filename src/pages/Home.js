@@ -44,6 +44,10 @@ function Home() {
         });
     };
 
+    const handleRemoveTrack = (track) => {
+        setSelectedTracks(prevTracks => prevTracks.filter(t => t.id !== track.id))
+    }
+
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -61,7 +65,7 @@ function Home() {
                 </div>
                 <div className="playlist-side">
                     <input type="text" placeholder="Rename your playlist..." onChange={event => setQuery(event.target.value)} />
-                    <Playlist selectedTracks={selectedTracks} />
+                    <Playlist selectedTracks={selectedTracks} onRemoveTrack={handleRemoveTrack} />
                 </div>
             </div>
         </div>
