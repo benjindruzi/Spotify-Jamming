@@ -99,3 +99,45 @@ export async function searchTracks(token, query) {
     
     return data.tracks.items;
 }
+
+export async function savePlaylist(token, user, tracks, playlistName) {
+    const createPlaylist = await fetch(`https://api.spotify.com/v1/users/${user.id}/playlists`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: playlistName,
+            description: 'Created through Spotify Jamming',
+            public: true
+        })
+    });
+
+    const playlistData = await createPlaylist.json();
+
+    if (!createPlaylist.ok) {
+        console.log('Failed to create playlist: ', playlistData);
+        return;
+    }
+
+    const addTracks = await fetch(`https://api.spotify.com/v1/playlists/${playlistData.id}/tracks`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            uris: tracks.map(track => track.uri)
+        })
+    });
+
+    const addTracksData = await addTracks.json();
+
+    if (!addTracks.ok) {
+        console.log('Failed to add tracks to playlist: ', addTracksData);
+        return;
+    }
+
+    return playlistData;
+}

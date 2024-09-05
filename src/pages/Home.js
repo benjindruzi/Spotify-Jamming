@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import SearchResults from '../components/SearchResults';
 import Playlist from '../components/Playlist';
 import { useAuth } from '../contexts/AuthContext';
-import { searchTracks } from '../helpers';
+import { savePlaylist, searchTracks } from '../helpers';
 import { useNavigate } from 'react-router-dom';
 
 function Home() {
@@ -12,6 +12,7 @@ function Home() {
     const { checkTokenExpiration, token, user } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
+    const [playlistName, setPlaylistName] = useState('');
 
     useEffect(() => {
         checkTokenExpiration();
@@ -48,6 +49,14 @@ function Home() {
         setSelectedTracks(prevTracks => prevTracks.filter(t => t.id !== track.id))
     }
 
+    const handleSavePlaylist = async () => {
+        if (token && user && selectedTracks.length > 0 && playlistName) {
+            const response = await savePlaylist(token, user, selectedTracks, playlistName);
+            alert(`Playlist "${response.name}" saved successfully!`);
+            setSelectedTracks('');
+        }
+    }
+
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -56,7 +65,7 @@ function Home() {
         <div className="home-container">
             <div className="header">
                 <h1>Spotify Jamming</h1>
-                <p>Welcome {user.email}</p>
+                <p>Welcome {user.id}</p>
             </div>
             <div className="content">
                 <div className="search-side">
@@ -64,10 +73,16 @@ function Home() {
                     <SearchResults tracks={results} onAddTrack={handleAddTrack} />
                 </div>
                 <div className="playlist-side">
-                    <input type="text" placeholder="Rename your playlist..." onChange={event => setQuery(event.target.value)} />
+                    <input type="text" placeholder="Rename your playlist..." onChange={event => setPlaylistName(event.target.value)} />
                     <Playlist selectedTracks={selectedTracks} onRemoveTrack={handleRemoveTrack} />
                 </div>
             </div>
+            {selectedTracks.length > 0
+                &&
+            <button className="save-playlist-button" onClick={handleSavePlaylist}>
+                Save to Spotify
+            </button>
+            }
         </div>
     );
 }

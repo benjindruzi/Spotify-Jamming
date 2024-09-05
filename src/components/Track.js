@@ -1,5 +1,5 @@
 function Track({ track, onAdd, onRemove }) {
-    const { album, name, artists, duration_ms } = track;
+    const { album, name, artists, duration_ms, uri } = track;
     const trackDuration = `${Math.floor(duration_ms / 60000)}:${('0' + Math.floor((duration_ms % 60000) / 1000)).slice(-2)}`;
 
     return (

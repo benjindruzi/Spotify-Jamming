@@ -153,3 +153,11 @@ input[type="text"] {
 .track-add-button:hover, .track-remove-button:hover {
     padding: 9px 13px;
 }
+
+.save-playlist-button {
+    margin-top: 10px;
+    padding: 10px 15px;
+    background-color: #1DB954;
+    border-radius: 10px;
+    cursor: pointer;
+}
