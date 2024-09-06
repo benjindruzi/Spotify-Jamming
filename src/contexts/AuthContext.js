@@ -14,6 +14,7 @@ export function AuthProvider({ children }) {
         const tokenExpiration = localStorage.getItem('token_expiration');
         if (!token || !tokenExpiration || new Date().getTime() > Number(tokenExpiration)) {
             clearToken();
+            console.log('PASS 1');
             if (window.location.pathname !== '/') navigate('/');
         } else {
             setIsAuthenticated(true);
